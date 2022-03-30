@@ -12,7 +12,7 @@ type CurrencyExchangePropsType = {
     changeCurrentCurrency: (e: React.MouseEvent<HTMLLIElement>) => void;
 };
 
-const CurrencyExchange: React.FC<CurrencyExchangePropsType> = ({
+const CurrencyExchange: React.FC<CurrencyExchangePropsType> = ({   //деструктуризация пропсов:
                                                                                   currenciesName,
                                                                                   currentCurrency,
                                                                                   currencyRate,
@@ -23,7 +23,8 @@ const CurrencyExchange: React.FC<CurrencyExchangePropsType> = ({
                                                                                   changeAction,
                                                                                   changeCurrentCurrency,
                                                                               }) => {
-    const viewCurrency = isBuying ? (
+    const viewCurrency = isBuying ? ( //это кнопки и их состояние -какая нажата.
+       // такое состояние имутов
         <React.Fragment>
             <label>
                 You give the next amount of BYN:
@@ -77,6 +78,7 @@ const CurrencyExchange: React.FC<CurrencyExchangePropsType> = ({
             </div>
             <div className="fields">
                 <p>Currency rate: {currencyRate}</p>
+                {/*//отрисовка самого инпута*/}
                 {viewCurrency}
             </div>
         </div>

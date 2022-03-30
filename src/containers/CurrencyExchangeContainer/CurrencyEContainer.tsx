@@ -5,12 +5,11 @@ import { Dispatch } from 'redux';
 import {
     ChangeActionAC,
     ChangeCurrencyFieldAC,
-    СhangeCurrentCurrencyAC,
-    CurrencyReducersTypes
+    CurrencyReducersTypes, ChangeCurrentCurrencyAC
 } from '../../redux/actions';
 import { connect, ConnectedProps } from 'react-redux';
 
-const CurrencyEContainer: React.FC<TProps> = props => {
+const CurrencyEContainer: React.FC<TProps> = props => { //это контейнерная компонента
 
     const {
         currencies,
@@ -33,14 +32,16 @@ const CurrencyEContainer: React.FC<TProps> = props => {
 
     const changeCurrencyField = (e: React.ChangeEvent<HTMLInputElement>) => {
         let value = e.currentTarget.value;
-        if (!isFinite(+value)) return;
-        if (e.currentTarget.dataset.currency) {
-            const trigger: string = e.currentTarget.dataset.currency;
+        if (!isFinite(+value)) return; //проверка на то чтобы пользователь вводил только числа и не вводил с числами буквы
+        //проверка на number не подхлдит.тк у него есть пару букв математических констант.
+        if (e.currentTarget.dataset.currency) { //тайпскрипт ничего не знает о dataset поэтому делаем проверку
+            const trigger: string = e.currentTarget.dataset.currency;//если тру, выполняем ниже код
             if (trigger === 'byn') {
                 if (value === '') {
                     setCurrencyAmount(value, value);
                 } else {
-                    setCurrencyAmount(value, (+Number(value).toFixed(2) / currencyRate).toFixed(2));
+                    setCurrencyAmount(value, (+Number(value).toFixed(2) / currencyRate).toFixed(2)); //+ чтоб конечный результат метода был приведен к числу
+                    //тк метод toFixed возращает строку
                 }
             } else {
                 if (value === '') {
@@ -51,7 +52,7 @@ const CurrencyEContainer: React.FC<TProps> = props => {
             }
         }
     };
-    const changeAction = (e: React.MouseEvent<HTMLSpanElement>) => {
+    const changeAction = (e: React.MouseEvent<HTMLSpanElement>) => { //проверка на датасет
         e.currentTarget.dataset.action === 'buy' ? setAction(true) : setAction(false);
     };
 
@@ -61,7 +62,7 @@ const CurrencyEContainer: React.FC<TProps> = props => {
 
     return (
         <React.Fragment>
-            <CurrencyExchange
+            <CurrencyExchange //внутри нее презентационная
                 currenciesName={currenciesName}
                 currentCurrency={currentCurrency}
                 currencyRate={currencyRate}
@@ -96,7 +97,7 @@ const mapDispatchToProps = (dispatch: Dispatch<CurrencyReducersTypes>) : any => 
             dispatch(ChangeActionAC(isBuying));
         },
         changeCurrency(currency: string) {
-            dispatch(СhangeCurrentCurrencyAC(currency));
+            dispatch(ChangeCurrentCurrencyAC(currency));
         },
     };
 };
@@ -104,7 +105,7 @@ const mapDispatchToProps = (dispatch: Dispatch<CurrencyReducersTypes>) : any => 
 // @ts-ignore
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-type TProps = ConnectedProps<typeof connector>;
+type TProps = ConnectedProps<typeof connector>; //автоматическая типизация всех пропсов в компоненте
 
-export default connector(CurrencyEContainer);
+export default connector(CurrencyEContainer); //подключение презентационной компоненты
 
