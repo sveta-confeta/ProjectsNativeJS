@@ -42,7 +42,8 @@ export const ChangeActionAC = (isBuying: boolean): ChangeAction => {
     }
 };
 
-export type ChangeCurrentCurrencyType = {
+export type ChangeCurrentCurrencyType =
+    {
     type:  ACTIONS_TYPE.CHANGE_CURRENT_CURRENCY,
     payload: {
         currentCurrency: string,

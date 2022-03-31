@@ -1,26 +1,36 @@
-import React from 'react';
+import React, {Dispatch} from 'react';
 import CurrencyExchange from '../../components/CurrencyExchange/CurrencyExchange';
-import { CurrencyState, CurrencyType } from '../../redux/currencyReducer';
-import { Dispatch } from 'redux';
+import {CurrencyType, selectorCurrencies} from '../../redux/currencyReducer';
 import {
     ChangeActionAC,
     ChangeCurrencyFieldAC,
-    CurrencyReducersTypes, ChangeCurrentCurrencyAC
+    ChangeCurrentCurrencyAC, CurrencyReducersTypes,
 } from '../../redux/actions';
-import { connect, ConnectedProps } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
-const CurrencyEContainer: React.FC<TProps> = props => { //это контейнерная компонента
+export const CurrencyEContainer=() => { //это контейнерная компонента
+
+    // const {
+    //     currencies,
+    //     currentCurrency,
+    //     isBuying,
+    //     amountOfBYN,
+    //     amountOfCurrency,
+    //     setCurrencyAmount,
+    //     setAction,
+    //     changeCurrency,
+    // } = props;
 
     const {
-        currencies,
+        currencies,    //useSelector достает все данные которые нам нужны и приложение работает норм
         currentCurrency,
         isBuying,
         amountOfBYN,
         amountOfCurrency,
-        setCurrencyAmount,
-        setAction,
-        changeCurrency,
-    } = props;
+    } = useSelector(selectorCurrencies) //selectorCurrencies-из редьюсера извлеченная часть стейта или весь стейт
+
+
+    const dispatch=useDispatch <Dispatch<CurrencyReducersTypes>>();
 
     let currencyRate: number = 0;
     const currenciesName = currencies.map((currency: CurrencyType) => {
@@ -38,26 +48,26 @@ const CurrencyEContainer: React.FC<TProps> = props => { //это контейн�
             const trigger: string = e.currentTarget.dataset.currency;//если тру, выполняем ниже код
             if (trigger === 'byn') {
                 if (value === '') {
-                    setCurrencyAmount(value, value);
+                    dispatch(ChangeCurrencyFieldAC(value, value));
                 } else {
-                    setCurrencyAmount(value, (+Number(value).toFixed(2) / currencyRate).toFixed(2)); //+ чтоб конечный результат метода был приведен к числу
+                    dispatch(ChangeCurrencyFieldAC(value, (+Number(value).toFixed(2) / currencyRate).toFixed(2))); //+ чтоб конечный результат метода был приведен к числу
                     //тк метод toFixed возращает строку
                 }
             } else {
                 if (value === '') {
-                    setCurrencyAmount(value, value);
+                    dispatch(ChangeCurrencyFieldAC(value, value));
                 } else {
-                    setCurrencyAmount((+Number(value).toFixed(2) * currencyRate).toFixed(2), value);
+                    dispatch(ChangeCurrencyFieldAC((+Number(value).toFixed(2) * currencyRate).toFixed(2), value));
                 }
             }
         }
     };
     const changeAction = (e: React.MouseEvent<HTMLSpanElement>) => { //проверка на датасет
-        e.currentTarget.dataset.action === 'buy' ? setAction(true) : setAction(false);
+        e.currentTarget.dataset.action === 'buy' ? dispatch(ChangeActionAC(true)) : dispatch(ChangeActionAC(false));
     };
 
     const changeCurrentCurrency = (e: React.MouseEvent<HTMLLIElement>) => {
-        e.currentTarget.dataset.currency && changeCurrency(e.currentTarget.dataset.currency);
+        e.currentTarget.dataset.currency && dispatch(ChangeCurrentCurrencyAC(e.currentTarget.dataset.currency));
     };
 
     return (
@@ -76,36 +86,37 @@ const CurrencyEContainer: React.FC<TProps> = props => { //это контейн�
         </React.Fragment>
     );
 };
+//будем переводить стейт на useSelector:
+// const mapStateToProps = ( { currency } : {currency: CurrencyState} ): CurrencyState => { //сдесь мы достаем ветку из стейта
+//     return {
+//         currencies: currency.currencies,
+//         currentCurrency: currency.currentCurrency,
+//         isBuying: currency.isBuying,
+//         amountOfBYN: currency.amountOfBYN,
+//         amountOfCurrency: currency.amountOfCurrency,
+//     };
+// };
 
-const mapStateToProps = ( { currency } : {currency: CurrencyState} ): CurrencyState => {
-    return {
-        currencies: currency.currencies,
-        currentCurrency: currency.currentCurrency,
-        isBuying: currency.isBuying,
-        amountOfBYN: currency.amountOfBYN,
-        amountOfCurrency: currency.amountOfCurrency,
-    };
-};
 
-// @ts-ignore
-const mapDispatchToProps = (dispatch: Dispatch<CurrencyReducersTypes>) : any => {
-    return {
-        setCurrencyAmount(amountOfBYN: string, amountOfCurrency: string) {
-            dispatch(ChangeCurrencyFieldAC(amountOfBYN, amountOfCurrency));
-        },
-        setAction(isBuying: boolean) {
-            dispatch(ChangeActionAC(isBuying));
-        },
-        changeCurrency(currency: string) {
-            dispatch(ChangeCurrentCurrencyAC(currency));
-        },
-    };
-};
+// const mapDispatchToProps = (dispatch: Dispatch<CurrencyReducersTypes>) : any => { //будем переводить стейт на useDispatch
+//     return {
+//         setCurrencyAmount(amountOfBYN: string, amountOfCurrency: string) {
+//             dispatch(ChangeCurrencyFieldAC(amountOfBYN, amountOfCurrency));
+//         },
+//         setAction(isBuying: boolean) {
+//             dispatch(ChangeActionAC(isBuying));
+//         },
+//         changeCurrency(currency: string) {
+//             dispatch(ChangeCurrentCurrencyAC(currency));
+//         },
+//     };
+// };
 
-// @ts-ignore
-const connector = connect(mapStateToProps, mapDispatchToProps);
 
-type TProps = ConnectedProps<typeof connector>; //автоматическая типизация всех пропсов в компоненте
+// const connector = connect(mapStateToProps, mapDispatchToProps);
+// const connector = connect(mapStateToProps, {});
 
-export default connector(CurrencyEContainer); //подключение презентационной компоненты
+// type TProps = ConnectedProps<typeof connector>; //автоматическая типизация всех пропсов в компоненте
+//
+// export default connector(CurrencyEContainer); //подключение презентационной компоненты
 
